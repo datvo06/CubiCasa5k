@@ -40,27 +40,42 @@ class ImageDataset(data.Dataset):
         return image
 
 
+
 def visualize_prediction(image, rooms, icons, output_file):
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
     ax.imshow(image)
 
+    # Define colormaps for rooms and icons
+    room_colors = plt.cm.get_cmap('tab20', len(room_cls))  # Using 'tab20' colormap for rooms
+    icon_colors = plt.cm.get_cmap('Set1', len(icon_cls))  # Using 'Set1' colormap for icons
+
     # Overlay room predictions
     for i, room in enumerate(room_cls):
-        if room != "Wall":
+        if room == "Background":
             continue
         room_mask = rooms[i, :, :] > 0.5
-        ax.imshow(np.ma.masked_where(~room_mask, room_mask), cmap='jet', alpha=0.5)
+        ax.imshow(np.ma.masked_where(~room_mask, room_mask), cmap=room_colors(i), alpha=0.5, label=room)
 
     # Overlay icon predictions (Window and Door)
     for i, icon in enumerate(icon_cls):
         if icon not in ["Window", "Door"]:
             continue
         icon_mask = icons[i, :, :] > 0.5
-        ax.imshow(np.ma.masked_where(~icon_mask, icon_mask), cmap='hot', alpha=0.5)
+        ax.imshow(np.ma.masked_where(~icon_mask, icon_mask), cmap=icon_colors(i), alpha=0.5, label=icon)
+
+    # Create a custom legend
+    handles = [plt.Line2D([0], [0], color=room_colors(i), lw=4) for i in range(len(room_cls)) if room_cls[i] != "Background"]
+    labels = [room for room in room_cls if room != "Background"]
+
+    handles += [plt.Line2D([0], [0], color=icon_colors(icon_cls.index(icon)), lw=4) for icon in ["Window", "Door"]]
+    labels += ["Window", "Door"]
+
+    ax.legend(handles, labels, bbox_to_anchor=(1.05, 1), loc='upper left')
 
     plt.axis('off')
-    plt.savefig(output_file)
+    plt.savefig(output_file, bbox_inches='tight')
     plt.close()
+
 
 
 def evaluate(args, log_dir, writer, logger):
