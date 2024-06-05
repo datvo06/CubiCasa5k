@@ -6,9 +6,6 @@ import torch
 from datetime import datetime
 from torch.utils import data
 from floortrans.models import get_model
-from floortrans.loaders import FloorplanSVG
-from floortrans.loaders.augmentations import DictToTensor, Compose
-from floortrans.metrics import get_evaluation_tensors
 from tqdm import tqdm
 import glob
 import cv2
