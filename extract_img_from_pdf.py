@@ -4,7 +4,7 @@ import os
 import sys
 import io
 
-def pdf_to_images_v2(pdf_path, output_folder, dpi=150):
+def pdf_to_images_v2(pdf_path, output_folder, dpi=300):
     # Read the PDF file as bytes
     with open(pdf_path, 'rb') as pdf_file:
         pdf_bytes = pdf_file.read()
