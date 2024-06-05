@@ -83,6 +83,7 @@ def evaluate(args, log_dir, writer, logger):
     with torch.no_grad():
         for count, val in tqdm(enumerate(data_loader), total=len(data_loader),
                                ncols=80, leave=False):
+            val = val.cuda()
             logger.info(count)
             pred = model(val)
             h, w = val.size(2), val.size(3)
