@@ -85,3 +85,7 @@ visdom==0.1.8.5
 wcwidth==0.1.7
 webencodings==0.5.1
 websocket-client==0.54.0
+pymupdf
+pdf2image
+scikit-image
+shapely

@@ -23,6 +23,9 @@ class ImageDataset(data.Dataset):
         self.image_files = glob.glob(data_dir + '/*.png')
         self.image_files += glob.glob(data_dir + '/*.jpg')
 
+    def __len__(self):
+        return len(self.image_files)
+
     def __getitem__(self, index):
         image = cv2.imread(self.image_files[index])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
