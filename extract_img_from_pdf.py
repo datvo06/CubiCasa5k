@@ -1,34 +1,36 @@
 
-import fitz
+from pdf2image import convert_from_bytes
 import os
 import sys
+import io
 
-def extract_images_from_pdf(pdf_path, output_folder):
-    # Open the PDF file
-    pdf_document = fitz.open(pdf_path)
-    pdf_name = os.path.splitext(os.path.basename(pdf_path))[0]
-
-    # Create output directory if it doesn't exist
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-
-    # Iterate through each page
-    for page_num in range(len(pdf_document)):
-        page = pdf_document.load_page(page_num)
-        image_list = page.get_images(full=True)
-
-        # Iterate through each image in the page
-        for img_index, img in enumerate(image_list):
-            xref = img[0]
-            base_image = pdf_document.extract_image(xref)
-            image_bytes = base_image["image"]
-
-            # Save the image
-            image_filename = os.path.join(output_folder, f"{pdf_name}_page_{page_num+1}_image_{img_index+1}.png")
-            with open(image_filename, "wb") as image_file:
-                image_file.write(image_bytes)
-
-            print(f"Saved image {image_filename}")
+def pdf_to_images_v2(pdf_path, output_folder, dpi=150):
+    # Read the PDF file as bytes
+    with open(pdf_path, 'rb') as pdf_file:
+        pdf_bytes = pdf_file.read()
+    
+    page_index = 0
+    while True:
+        try:
+            # Convert the current page to an image
+            images = convert_from_bytes(pdf_bytes, dpi=dpi, fmt='png', first_page=page_index+1, last_page=page_index+1)
+            if not images:
+                break
+            
+            image = images[0]
+            img_byte_arr = io.BytesIO()
+            image.save(img_byte_arr, format='PNG')
+            img_byte_arr = img_byte_arr.getvalue()
+            
+            # Save the image to the output folder
+            output_file = os.path.join(output_folder, f"{os.path.splitext(os.path.basename(pdf_path))[0]}_page_{page_index+1}.png")
+            with open(output_file, 'wb') as img_file:
+                img_file.write(img_byte_arr)
+            
+            print(f"Saved image {output_file}")
+            page_index += 1
+        except IndexError:
+            break
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -38,4 +40,8 @@ if __name__ == "__main__":
     pdf_path = sys.argv[1]
     output_folder = sys.argv[2]
     
-    extract_images_from_pdf(pdf_path, output_folder)
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    pdf_to_images_v2(pdf_path, output_folder)
+
