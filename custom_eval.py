@@ -46,7 +46,7 @@ def visualize_prediction(image, rooms, icons, output_file):
 
     # Overlay room predictions
     for i, room in enumerate(room_cls):
-        if room == "Background":
+        if room != "Wall":
             continue
         room_mask = rooms[i, :, :] > 0.5
         ax.imshow(np.ma.masked_where(~room_mask, room_mask), cmap='jet', alpha=0.5)
