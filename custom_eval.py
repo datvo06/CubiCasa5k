@@ -87,6 +87,7 @@ def evaluate(args, log_dir, writer, logger):
             logger.info(count)
             pred = model(val)
             h, w = val.size(2), val.size(3)
+            pred = pred.detach().cpu()
             heatmaps, rooms, icons = post_prosessing.split_prediction(
                 pred, (h, w), split)
             image = val.cpu().numpy()[0].transpose(1, 2, 0)
