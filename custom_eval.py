@@ -54,14 +54,16 @@ def visualize_prediction(image, rooms, icons, output_file):
         if room == "Background":
             continue
         room_mask = rooms[i, :, :] > 0.5
-        ax.imshow(np.ma.masked_where(~room_mask, room_mask), cmap=room_colors(i), alpha=0.5, label=room)
+        color = room_colors(i)
+        ax.imshow(np.ma.masked_where(~room_mask, room_mask), cmap=plt.cm.colors.ListedColormap([color]), alpha=0.5, label=room)
 
     # Overlay icon predictions (Window and Door)
     for i, icon in enumerate(icon_cls):
         if icon not in ["Window", "Door"]:
             continue
         icon_mask = icons[i, :, :] > 0.5
-        ax.imshow(np.ma.masked_where(~icon_mask, icon_mask), cmap=icon_colors(i), alpha=0.5, label=icon)
+        color = icon_colors(i)
+        ax.imshow(np.ma.masked_where(~icon_mask, icon_mask), cmap=plt.cm.colors.ListedColormap([color]), alpha=0.5, label=icon)
 
     # Create a custom legend
     handles = [plt.Line2D([0], [0], color=room_colors(i), lw=4) for i in range(len(room_cls)) if room_cls[i] != "Background"]
@@ -75,7 +77,6 @@ def visualize_prediction(image, rooms, icons, output_file):
     plt.axis('off')
     plt.savefig(output_file, bbox_inches='tight')
     plt.close()
-
 
 
 def evaluate(args, log_dir, writer, logger):
