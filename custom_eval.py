@@ -92,8 +92,9 @@ def evaluate(args, log_dir, writer, logger):
                 pred, (h, w), split)
             image = val.cpu().numpy()[0].transpose(1, 2, 0)
             image = ((image + 1) / 2 * 255).astype(np.uint8)  # Denormalize to original image
-            rooms = rooms.cpu().numpy()[0]
-            icons = icons.cpu().numpy()[0]
+            print(rooms.shape, icons.shape)
+            rooms = rooms[0]
+            icons = icons[0]
             
             output_file = os.path.join(log_dir, f"visualization_{count}.png")
             visualize_prediction(image, rooms, icons, output_file)
