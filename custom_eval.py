@@ -48,14 +48,14 @@ def visualize_prediction(image, rooms, icons, output_file):
     for i, room in enumerate(room_cls):
         if room == "Background":
             continue
-        room_mask = rooms == i
+        room_mask = rooms[i, :, :] > 0.5
         ax.imshow(np.ma.masked_where(~room_mask, room_mask), cmap='jet', alpha=0.5)
 
     # Overlay icon predictions (Window and Door)
     for i, icon in enumerate(icon_cls):
         if icon not in ["Window", "Door"]:
             continue
-        icon_mask = icons == i
+        icon_mask = icons[i, :, :] > 0.5
         ax.imshow(np.ma.masked_where(~icon_mask, icon_mask), cmap='hot', alpha=0.5)
 
     plt.axis('off')
@@ -92,9 +92,7 @@ def evaluate(args, log_dir, writer, logger):
                 pred, (h, w), split)
             image = val.cpu().numpy()[0].transpose(1, 2, 0)
             image = ((image + 1) / 2 * 255).astype(np.uint8)  # Denormalize to original image
-            print(rooms.shape, icons.shape)
-            rooms = rooms[0]
-            icons = icons[0]
+            # rooms: 12, icons: 11
             
             output_file = os.path.join(log_dir, f"visualization_{count}.png")
             visualize_prediction(image, rooms, icons, output_file)
